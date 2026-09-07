@@ -20,8 +20,8 @@ class BuscarUsuarioPorIdUseCase:
     def __init__(self, usuario_repository: IUsuarioRepository):
         self._usuario_repository = usuario_repository
 
-    async def executar(self, id: UUID) -> UsuarioResponseDTO:
-        usuario = await self._usuario_repository.buscar_por_id(id)
+    async def executar(self, usuario_id: UUID) -> UsuarioResponseDTO:
+        usuario = await self._usuario_repository.buscar_por_id(usuario_id)
         if not usuario:
             raise DomainException("Usuário não encontrado")
         return _para_dto(usuario)

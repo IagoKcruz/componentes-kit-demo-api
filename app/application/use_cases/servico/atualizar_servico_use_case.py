@@ -8,8 +8,8 @@ class AtualizarServicoUseCase:
     def __init__(self, servico_repository: IServicoRepository):
         self._servico_repository = servico_repository
 
-    async def executar(self, id: UUID, dto: AtualizarServicoDTO) -> ServicoResponseDTO:
-        servico = await self._servico_repository.buscar_por_id(id)
+    async def executar(self, servico_id: UUID, dto: AtualizarServicoDTO) -> ServicoResponseDTO:
+        servico = await self._servico_repository.buscar_por_id(servico_id)
         if not servico:
             raise DomainException("Serviço não encontrado")
 
@@ -21,6 +21,8 @@ class AtualizarServicoUseCase:
         )
 
         atualizado = await self._servico_repository.atualizar(servico)
+        if not atualizado:
+            raise DomainException("Erro ao atualizar serviço")
 
         return ServicoResponseDTO(
             id=atualizado.id,
