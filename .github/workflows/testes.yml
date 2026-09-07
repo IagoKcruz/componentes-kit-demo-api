@@ -1,0 +1,27 @@
+name: Testes
+
+on:
+  push:
+    branches: [Dev, master]
+  pull_request:
+    branches: [Dev, master]
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Instalar dependências
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Executar testes
+        run: pytest tests/ -v --tb=short
