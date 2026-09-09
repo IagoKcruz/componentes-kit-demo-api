@@ -1,34 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from uuid import UUID
+from app.domain.contracts.iRepository import IRepository
 from app.domain.entities.usuario import Usuario
 
 
-class IUsuarioRepository(ABC):
+class IUsuarioRepository(IRepository[Usuario, UUID]):
+    @abstractmethod
+    async def buscarPorEmail(self, email: str) -> Usuario | None: ...
 
     @abstractmethod
-    async def salvar(self, usuario: Usuario) -> Usuario:
-        pass
-
-    @abstractmethod
-    async def buscarPorId(self, id: UUID) -> Usuario | None:
-        pass
-
-    @abstractmethod
-    async def buscarPorEmail(self, email: str) -> Usuario | None:
-        pass
-
-    @abstractmethod
-    async def buscarPorCpf(self, cpf: str) -> Usuario | None:
-        pass
-
-    @abstractmethod
-    async def listar(self) -> list[Usuario]:
-        pass
-
-    @abstractmethod
-    async def atualizar(self, usuario: Usuario) -> Usuario | None:
-        pass
-
-    @abstractmethod
-    async def deletar(self, id: UUID) -> None:
-        pass
+    async def buscarPorCpf(self, cpf: str) -> Usuario | None: ...

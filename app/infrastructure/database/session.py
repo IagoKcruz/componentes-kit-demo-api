@@ -4,7 +4,8 @@ from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.infrastructure.config import settings
 
-engine = create_async_engine(settings.database_url, echo=settings.debug)
+_connect_args = {"ssl": "require"} if "supabase.com" in settings.database_url else {}
+engine = create_async_engine(settings.database_url, echo=settings.debug, connect_args=_connect_args)
 _sessionFactory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

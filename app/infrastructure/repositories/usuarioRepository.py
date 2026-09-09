@@ -2,89 +2,21 @@ from uuid import UUID
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+from app.domain.contracts.iUsuarioRepository import IUsuarioRepository
 from app.domain.entities.usuario import Usuario
 from app.domain.enums.tipoUsuario import TipoUsuario
-from app.domain.contracts.iUsuarioRepository import IUsuarioRepository
-from app.domain.valueObjects.email import Email
 from app.domain.valueObjects.cpf import CPF
+from app.domain.valueObjects.email import Email
 from app.infrastructure.database.models.usuarioModel import UsuarioModel, TipoUsuarioModel
+from app.infrastructure.repositories.repository import Repository
 
 
-class SqlModelUsuarioRepository(IUsuarioRepository):
+class UsuarioRepository(Repository[Usuario, UsuarioModel, UUID], IUsuarioRepository):
     def __init__(self, session: AsyncSession):
-        self._session = session
+        super().__init__(session, UsuarioModel)
 
-    async def salvar(self, usuario: Usuario) -> Usuario:
-        tiposModels = await self._buscarTipoModels(usuario.tipos)
-        model = UsuarioModel(
-            id=usuario.id,
-            nome=usuario.nome,
-            email=str(usuario.email),
-            cpf=str(usuario.cpf),
-            senha_hash=usuario.senhaHash,
-            ativo=usuario.ativo,
-            tipos=tiposModels,
-        )
-        self._session.add(model)
-        return usuario
-
-    async def buscarPorId(self, id: UUID) -> Usuario | None:
-        result = await self._session.exec(
-            select(UsuarioModel)
-            .where(UsuarioModel.id == id)
-            .options(selectinload(UsuarioModel.tipos))  # type: ignore[arg-type]
-        )
-        model = result.first()
-        return self._paraEntidade(model) if model else None
-
-    async def buscarPorEmail(self, email: str) -> Usuario | None:
-        result = await self._session.exec(
-            select(UsuarioModel)
-            .where(UsuarioModel.email == email)
-            .options(selectinload(UsuarioModel.tipos))  # type: ignore[arg-type]
-        )
-        model = result.first()
-        return self._paraEntidade(model) if model else None
-
-    async def buscarPorCpf(self, cpf: str) -> Usuario | None:
-        cpfFormatado = CPF(cpf).valor
-        result = await self._session.exec(
-            select(UsuarioModel)
-            .where(UsuarioModel.cpf == cpfFormatado)
-            .options(selectinload(UsuarioModel.tipos))  # type: ignore[arg-type]
-        )
-        model = result.first()
-        return self._paraEntidade(model) if model else None
-
-    async def listar(self) -> list[Usuario]:
-        result = await self._session.exec(
-            select(UsuarioModel).options(selectinload(UsuarioModel.tipos))  # type: ignore[arg-type]
-        )
-        return [self._paraEntidade(m) for m in result.all()]
-
-    async def atualizar(self, usuario: Usuario) -> Usuario | None:
-        model = await self._session.get(UsuarioModel, usuario.id)
-        if not model:
-            return None
-        model.nome = usuario.nome
-        model.email = str(usuario.email)
-        model.cpf = str(usuario.cpf)
-        model.senha_hash = usuario.senhaHash
-        model.ativo = usuario.ativo
-        model.tipos = await self._buscarTipoModels(usuario.tipos)
-        return usuario
-
-    async def deletar(self, id: UUID) -> None:
-        model = await self._session.get(UsuarioModel, id)
-        if model:
-            await self._session.delete(model)
-
-    async def _buscarTipoModels(self, tipos: list[TipoUsuario]) -> list[TipoUsuarioModel]:
-        nomes = [t.value for t in tipos]
-        result = await self._session.exec(
-            select(TipoUsuarioModel).where(TipoUsuarioModel.nome.in_(nomes))  # type: ignore[attr-defined]
-        )
-        return list(result.all())
+    def _queryOptions(self) -> list:
+        return [selectinload(UsuarioModel.tipos)]  # type: ignore[arg-type]
 
     def _paraEntidade(self, model: UsuarioModel) -> Usuario:
         return Usuario(
@@ -96,3 +28,54 @@ class SqlModelUsuarioRepository(IUsuarioRepository):
             ativo=model.ativo,
             tipos=[TipoUsuario(t.nome) for t in model.tipos],
         )
+
+    def _paraModel(self, usuario: Usuario) -> UsuarioModel:
+        return UsuarioModel(
+            id=usuario.id,
+            nome=usuario.nome,
+            email=str(usuario.email),
+            cpf=str(usuario.cpf),
+            senha_hash=usuario.senhaHash,
+            ativo=usuario.ativo,
+        )
+
+    async def _aplicarCampos(self, usuario: Usuario, model: UsuarioModel) -> None:
+        model.nome = usuario.nome
+        model.email = str(usuario.email)
+        model.cpf = str(usuario.cpf)
+        model.senha_hash = usuario.senhaHash
+        model.ativo = usuario.ativo
+        model.tipos = await self._buscarTipoModels(usuario.tipos)
+
+    async def salvar(self, usuario: Usuario) -> Usuario:
+        tiposModels = await self._buscarTipoModels(usuario.tipos)
+        model = self._paraModel(usuario)
+        model.tipos = tiposModels
+        self._session.add(model)
+        return usuario
+
+    async def buscarPorEmail(self, email: str) -> Usuario | None:
+        result = await self._session.exec(
+            select(UsuarioModel)
+            .where(UsuarioModel.email == email)
+            .options(*self._queryOptions())
+        )
+        model = result.first()
+        return self._paraEntidade(model) if model else None
+
+    async def buscarPorCpf(self, cpf: str) -> Usuario | None:
+        cpfFormatado = CPF(cpf).valor
+        result = await self._session.exec(
+            select(UsuarioModel)
+            .where(UsuarioModel.cpf == cpfFormatado)
+            .options(*self._queryOptions())
+        )
+        model = result.first()
+        return self._paraEntidade(model) if model else None
+
+    async def _buscarTipoModels(self, tipos: list[TipoUsuario]) -> list[TipoUsuarioModel]:
+        nomes = [t.value for t in tipos]
+        result = await self._session.exec(
+            select(TipoUsuarioModel).where(TipoUsuarioModel.nome.in_(nomes))  # type: ignore[attr-defined]
+        )
+        return list(result.all())

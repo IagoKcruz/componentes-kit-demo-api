@@ -1,15 +1,15 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from app.application.contracts.iUnitOfWork import IUnitOfWork
 from app.infrastructure.database.session import engine
-from app.infrastructure.repositories.servicoRepository import SqlModelServicoRepository
-from app.infrastructure.repositories.usuarioRepository import SqlModelUsuarioRepository
+from app.infrastructure.repositories.servicoRepository import ServicoRepository
+from app.infrastructure.repositories.usuarioRepository import UsuarioRepository
 
 
 class SqlModelUnitOfWork(IUnitOfWork):
     async def __aenter__(self) -> "SqlModelUnitOfWork":
         self._session = AsyncSession(engine, expire_on_commit=False)
-        self.servicos = SqlModelServicoRepository(self._session)
-        self.usuarios = SqlModelUsuarioRepository(self._session)
+        self.servicos = ServicoRepository(self._session)
+        self.usuarios = UsuarioRepository(self._session)
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
