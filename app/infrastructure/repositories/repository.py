@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Generic, Type, TypeVar
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.domain.contracts.iRepository import IRepository
+from app.domain.contracts.i_repository import IRepository
 
 T = TypeVar("T")
 M = TypeVar("M")

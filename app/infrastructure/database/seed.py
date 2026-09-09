@@ -1,6 +1,6 @@
 from sqlmodel import select
 from app.infrastructure.database.session import _sessionFactory
-from app.infrastructure.database.models.usuarioModel import TipoUsuarioModel
+from app.infrastructure.database.models.usuario_model import TipoUsuarioModel
 
 
 async def seedTiposUsuario() -> None:

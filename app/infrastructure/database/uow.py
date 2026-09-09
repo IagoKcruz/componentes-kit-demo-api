@@ -1,8 +1,8 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
-from app.application.contracts.iUnitOfWork import IUnitOfWork
+from app.application.contracts.i_unit_of_work import IUnitOfWork
 from app.infrastructure.database.session import engine
-from app.infrastructure.repositories.servicoRepository import ServicoRepository
-from app.infrastructure.repositories.usuarioRepository import UsuarioRepository
+from app.infrastructure.repositories.servico_repository import ServicoRepository
+from app.infrastructure.repositories.usuario_repository import UsuarioRepository
 
 
 class SqlModelUnitOfWork(IUnitOfWork):

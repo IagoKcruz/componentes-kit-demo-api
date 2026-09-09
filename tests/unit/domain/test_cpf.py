@@ -1,6 +1,6 @@
 import pytest
-from app.domain.valueObjects.cpf import CPF
-from app.domain.exceptions.domainException import DomainException
+from app.domain.value_objects.cpf import CPF
+from app.domain.exceptions.domain_exception import DomainException
 
 
 def test_cpf_valido():
