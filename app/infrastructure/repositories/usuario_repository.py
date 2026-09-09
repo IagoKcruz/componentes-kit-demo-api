@@ -1,13 +1,18 @@
 from uuid import UUID
+
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+
 from app.domain.contracts.i_usuario_repository import IUsuarioRepository
 from app.domain.entities.usuario import Usuario
 from app.domain.enums.tipo_usuario import TipoUsuario
 from app.domain.value_objects.cpf import CPF
 from app.domain.value_objects.email import Email
-from app.infrastructure.database.models.usuario_model import UsuarioModel, TipoUsuarioModel
+from app.infrastructure.database.models.usuario_model import (
+    TipoUsuarioModel,
+    UsuarioModel,
+)
 from app.infrastructure.repositories.repository import Repository
 
 

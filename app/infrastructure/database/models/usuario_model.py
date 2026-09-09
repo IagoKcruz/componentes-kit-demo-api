@@ -1,5 +1,6 @@
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
+
 from sqlalchemy import Column
 from sqlalchemy.types import DateTime
 from sqlmodel import SQLModel, Field, Relationship

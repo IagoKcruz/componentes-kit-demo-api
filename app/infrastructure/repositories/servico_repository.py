@@ -1,6 +1,8 @@
 from uuid import UUID
+
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+
 from app.domain.contracts.i_servico_repository import IServicoRepository
 from app.domain.entities.servico import Servico
 from app.infrastructure.database.models.servico_model import ServicoModel

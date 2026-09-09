@@ -1,7 +1,9 @@
 from collections.abc import AsyncIterator
+
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
+
 from app.infrastructure.config import settings
 
 _connect_args = {"ssl": "require"} if "supabase.com" in settings.database_url else {}

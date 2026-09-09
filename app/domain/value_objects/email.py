@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+
 from app.domain.exceptions.domain_exception import DomainException
 
 

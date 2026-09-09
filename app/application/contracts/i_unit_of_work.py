@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from app.domain.contracts.i_servico_repository import IServicoRepository
 from app.domain.contracts.i_usuario_repository import IUsuarioRepository
 

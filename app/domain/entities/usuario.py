@@ -1,5 +1,6 @@
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
+
 from app.domain.value_objects.email import Email
 from app.domain.value_objects.cpf import CPF
 from app.domain.enums.tipo_usuario import TipoUsuario
