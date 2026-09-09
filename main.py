@@ -9,6 +9,7 @@ from app.infrastructure.config import settings
 from app.infrastructure.database.session import criarTabelas
 from app.infrastructure.database.seed import seedTiposUsuario
 from app.presentation.routers import usuario_router, servico_router, auth_router
+from app.domain.exceptions.domain_exception import DomainException
 from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
 from app.domain.exceptions.validacao_error import ValidacaoError
 from app.domain.exceptions.autenticacao_error import AutenticacaoError
@@ -41,6 +42,11 @@ app.add_middleware(
 async def handleValidacaoPydantic(_: Request, exc: RequestValidationError):
     mensagens = [e["msg"].removeprefix("Value error, ") for e in exc.errors()]
     return JSONResponse(status_code=422, content={"detail": "; ".join(mensagens)})
+
+
+@app.exception_handler(DomainException)
+async def handleDomainException(_, exc: DomainException):
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
 
 
 @app.exception_handler(EntidadeNaoEncontradaError)

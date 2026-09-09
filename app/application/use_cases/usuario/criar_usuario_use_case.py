@@ -1,3 +1,4 @@
+import anyio
 import bcrypt
 
 from app.application.contracts.i_unit_of_work import IUnitOfWork
@@ -19,7 +20,9 @@ class CriarUsuarioUseCase:
             if await uow.usuarios.buscarPorCpf(dto.cpf):
                 raise ValidacaoError("CPF já cadastrado")
 
-            senhaHash = bcrypt.hashpw(dto.senha.encode(), bcrypt.gensalt()).decode()
+            senhaHash = await anyio.to_thread.run_sync(
+                lambda: bcrypt.hashpw(dto.senha.encode(), bcrypt.gensalt()).decode()
+            )
 
             usuario = Usuario.criar(
                 nome=dto.nome,

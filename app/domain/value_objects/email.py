@@ -9,8 +9,10 @@ class Email:
     valor: str
 
     def __post_init__(self):
-        if not self._isValido(self.valor):
+        normalizado = self.valor.strip().lower()
+        if not self._isValido(normalizado):
             raise DomainException("E-mail inválido")
+        object.__setattr__(self, 'valor', normalizado)
 
     @staticmethod
     def _isValido(email: str) -> bool:

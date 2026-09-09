@@ -28,14 +28,14 @@ class LoginUseCase:
         if not usuario:
             raise AutenticacaoError("Credenciais inválidas")
 
+        if not usuario.ativo:
+            raise AutenticacaoError("Credenciais inválidas")
+
         senhaOk = await anyio.to_thread.run_sync(
             lambda: bcrypt.checkpw(dto.senha.encode(), usuario.senhaHash.encode())
         )
         if not senhaOk:
             raise AutenticacaoError("Credenciais inválidas")
-
-        if not usuario.ativo:
-            raise AutenticacaoError("Usuário inativo")
 
         expiracao = datetime.now(timezone.utc) + timedelta(minutes=self._jwtExpiracaoMinutos)
 

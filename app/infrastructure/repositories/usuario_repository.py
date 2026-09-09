@@ -7,6 +7,8 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from app.domain.contracts.i_usuario_repository import IUsuarioRepository
 from app.domain.entities.usuario import Usuario
 from app.domain.enums.tipo_usuario import TipoUsuario
+from app.domain.exceptions.domain_exception import DomainException
+from app.domain.exceptions.validacao_error import ValidacaoError
 from app.domain.value_objects.cpf import CPF
 from app.domain.value_objects.email import Email
 from app.infrastructure.database.models.usuario_model import (
@@ -69,7 +71,10 @@ class UsuarioRepository(Repository[Usuario, UsuarioModel, UUID], IUsuarioReposit
         return self._paraEntidade(model) if model else None
 
     async def buscarPorCpf(self, cpf: str) -> Usuario | None:
-        cpfFormatado = CPF(cpf).valor
+        try:
+            cpfFormatado = CPF(cpf).valor
+        except DomainException:
+            raise ValidacaoError("CPF inválido")
         result = await self._session.exec(
             select(UsuarioModel)
             .where(UsuarioModel.cpf == cpfFormatado)
