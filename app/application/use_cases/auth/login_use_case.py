@@ -1,10 +1,12 @@
+from datetime import datetime, timedelta, timezone
+
 import anyio
 import bcrypt
-from datetime import datetime, timedelta, timezone
 from jose import jwt
+
+from app.application.dtos.auth_dto import LoginDTO, TokenResponseDTO
 from app.domain.contracts.i_usuario_repository import IUsuarioRepository
 from app.domain.exceptions.autenticacao_error import AutenticacaoError
-from app.application.dtos.auth_dto import LoginDTO, TokenResponseDTO
 
 
 class LoginUseCase:

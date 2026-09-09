@@ -1,15 +1,17 @@
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, status
+
 from app.application.contracts.i_unit_of_work import IUnitOfWork
-from app.application.dtos.servico_dto import CriarServicoDTO, AtualizarServicoDTO, ServicoResponseDTO
+from app.application.dtos.servico_dto import AtualizarServicoDTO, CriarServicoDTO, ServicoResponseDTO
+from app.application.mappers.servico_mapper import ServicoMapper
+from app.application.use_cases.servico.atualizar_servico_use_case import AtualizarServicoUseCase
 from app.application.use_cases.servico.criar_servico_use_case import CriarServicoUseCase
 from app.application.use_cases.servico.listar_servicos_use_case import ListarServicosUseCase
-from app.application.use_cases.servico.atualizar_servico_use_case import AtualizarServicoUseCase
 from app.application.use_cases.servico.remover_servico_use_case import RemoverServicoUseCase
-from app.application.mappers.servico_mapper import ServicoMapper
 from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
-from app.presentation.dependencies.dependencies import getUow
 from app.presentation.dependencies.auth import verificarAutenticacao
+from app.presentation.dependencies.dependencies import getUow
 
 router = APIRouter(
     prefix="/servicos",

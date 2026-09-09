@@ -1,9 +1,10 @@
 import bcrypt
-from app.domain.entities.usuario import Usuario
+
 from app.application.contracts.i_unit_of_work import IUnitOfWork
-from app.domain.exceptions.validacao_error import ValidacaoError
 from app.application.dtos.usuario_dto import CriarUsuarioDTO, UsuarioResponseDTO
 from app.application.mappers.usuario_mapper import UsuarioMapper
+from app.domain.entities.usuario import Usuario
+from app.domain.exceptions.validacao_error import ValidacaoError
 
 
 class CriarUsuarioUseCase:

@@ -1,14 +1,16 @@
 from uuid import UUID
+
 from fastapi import APIRouter, Depends, status
+
 from app.application.contracts.i_unit_of_work import IUnitOfWork
 from app.application.dtos.usuario_dto import CriarUsuarioDTO, UsuarioResponseDTO
-from app.application.use_cases.usuario.criar_usuario_use_case import CriarUsuarioUseCase
 from app.application.use_cases.usuario.buscar_usuario_use_case import (
     BuscarUsuarioPorIdUseCase,
     ListarUsuariosUseCase,
 )
-from app.presentation.dependencies.dependencies import getUow
+from app.application.use_cases.usuario.criar_usuario_use_case import CriarUsuarioUseCase
 from app.presentation.dependencies.auth import verificarAutenticacao
+from app.presentation.dependencies.dependencies import getUow
 
 router = APIRouter(
     prefix="/usuarios",
