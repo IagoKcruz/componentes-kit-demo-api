@@ -1,7 +1,7 @@
 import pytest
 from app.domain.entities.usuario import Usuario
-from app.domain.enums.tipoUsuario import TipoUsuario
-from app.domain.exceptions.domainException import DomainException
+from app.domain.enums.tipo_usuario import TipoUsuario
+from app.domain.exceptions.domain_exception import DomainException
 
 CPF_VALIDO = "529.982.247-25"
 EMAIL_VALIDO = "admin@teste.com"

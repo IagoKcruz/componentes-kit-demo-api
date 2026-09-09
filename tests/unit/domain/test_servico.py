@@ -1,7 +1,7 @@
 import pytest
 from decimal import Decimal
 from app.domain.entities.servico import Servico
-from app.domain.exceptions.domainException import DomainException
+from app.domain.exceptions.domain_exception import DomainException
 
 
 def test_criar_servico_valido():
