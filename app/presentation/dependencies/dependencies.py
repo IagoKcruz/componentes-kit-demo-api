@@ -1,13 +1,31 @@
-from sqlmodel import Session
 from fastapi import Depends
-from app.infrastructure.database.session import get_session
-from app.infrastructure.repositories.sqlmodel_usuario_repository import SqlModelUsuarioRepository
-from app.infrastructure.repositories.sqlmodel_servico_repository import SqlModelServicoRepository
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+from app.application.contracts.i_unit_of_work import IUnitOfWork
+from app.application.use_cases.auth.login_use_case import LoginUseCase
+from app.infrastructure.config import settings
+from app.infrastructure.database.session import getSession
+from app.infrastructure.database.uow import SqlModelUnitOfWork
+from app.infrastructure.repositories.servico_repository import ServicoRepository
+from app.infrastructure.repositories.usuario_repository import UsuarioRepository
 
 
-def get_usuario_repository(session: Session = Depends(get_session)) -> SqlModelUsuarioRepository:
-    return SqlModelUsuarioRepository(session)
+def getUow() -> IUnitOfWork:
+    return SqlModelUnitOfWork()
 
 
-def get_servico_repository(session: Session = Depends(get_session)) -> SqlModelServicoRepository:
-    return SqlModelServicoRepository(session)
+async def getUsuarioRepository(session: AsyncSession = Depends(getSession)) -> UsuarioRepository:
+    return UsuarioRepository(session)
+
+
+async def getServicoRepository(session: AsyncSession = Depends(getSession)) -> ServicoRepository:
+    return ServicoRepository(session)
+
+
+async def getLoginUseCase(repo: UsuarioRepository = Depends(getUsuarioRepository)) -> LoginUseCase:
+    return LoginUseCase(
+        usuario_repository=repo,
+        jwt_secret=settings.jwt_secret,
+        jwt_algoritmo=settings.jwt_algoritmo,
+        jwt_expiracao_minutos=settings.jwt_expiracao_minutos,
+    )

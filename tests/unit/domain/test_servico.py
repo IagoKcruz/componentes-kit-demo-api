@@ -7,7 +7,7 @@ from app.domain.exceptions.domain_exception import DomainException
 def test_criar_servico_valido():
     s = Servico.criar("Corte de Cabelo", "Desc", 45, Decimal("50.00"))
     assert s.nome == "Corte de Cabelo"
-    assert s.duracao_minutos == 45
+    assert s.duracaoMinutos == 45
     assert s.preco == Decimal("50.00")
     assert s.ativo is True
 
@@ -63,11 +63,11 @@ def test_atualizar_nome_vazio_levanta_excecao():
 def test_atualizar_duracao_invalida_levanta_excecao():
     s = Servico.criar("Nome", "Desc", 30, Decimal("10"))
     with pytest.raises(DomainException, match="Duração deve ser maior que zero"):
-        s.atualizar(duracao_minutos=0)
+        s.atualizar(duracaoMinutos=0)
 
 
 def test_atualizar_sem_campos_nao_altera():
     s = Servico.criar("Nome", "Desc", 30, Decimal("10"))
     s.atualizar()
     assert s.nome == "Nome"
-    assert s.duracao_minutos == 30
+    assert s.duracaoMinutos == 30

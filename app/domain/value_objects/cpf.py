@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+
 from app.domain.exceptions.domain_exception import DomainException
 
 
@@ -9,13 +10,12 @@ class CPF:
 
     def __post_init__(self):
         digitos = re.sub(r'\D', '', self.valor)
-        if not self._is_valido(digitos):
+        if not self._isValido(digitos):
             raise DomainException("CPF inválido")
-        # frozen=True exige object.__setattr__ para reatribuir no __post_init__
         object.__setattr__(self, 'valor', self._formatar(digitos))
 
     @staticmethod
-    def _is_valido(digitos: str) -> bool:
+    def _isValido(digitos: str) -> bool:
         if len(digitos) != 11:
             return False
         if len(set(digitos)) == 1:

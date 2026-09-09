@@ -1,14 +1,22 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.infrastructure.database.session import criar_tabelas, seed_tipos_usuario
+from fastapi.responses import JSONResponse
+
+from app.infrastructure.config import settings
+from app.infrastructure.database.session import criarTabelas
+from app.infrastructure.database.seed import seedTiposUsuario
 from app.presentation.routers import usuario_router, servico_router, auth_router
+from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
+from app.domain.exceptions.validacao_error import ValidacaoError
+from app.domain.exceptions.autenticacao_error import AutenticacaoError
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    criar_tabelas()
-    seed_tipos_usuario()
+    await criarTabelas()
+    await seedTiposUsuario()
     yield
 
 
@@ -21,11 +29,27 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(EntidadeNaoEncontradaError)
+async def handleNaoEncontrado(_, exc: EntidadeNaoEncontradaError):
+    return JSONResponse(status_code=404, content={"detail": exc.mensagem})
+
+
+@app.exception_handler(ValidacaoError)
+async def handleValidacao(_, exc: ValidacaoError):
+    return JSONResponse(status_code=400, content={"detail": exc.mensagem})
+
+
+@app.exception_handler(AutenticacaoError)
+async def handleAutenticacao(_, exc: AutenticacaoError):
+    return JSONResponse(status_code=401, content={"detail": exc.mensagem})
+
 
 app.include_router(auth_router.router)
 app.include_router(usuario_router.router)

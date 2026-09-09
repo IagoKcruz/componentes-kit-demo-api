@@ -1,13 +1,13 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
+
 from app.infrastructure.config import settings
 
-# auto_error=False para conseguirmos retornar None quando auth está desabilitado
 _security = HTTPBearer(auto_error=False)
 
 
-async def verificar_autenticacao(
+async def verificarAutenticacao(
     credentials: HTTPAuthorizationCredentials | None = Depends(_security),
 ) -> dict | None:
     if not settings.auth_habilitado:

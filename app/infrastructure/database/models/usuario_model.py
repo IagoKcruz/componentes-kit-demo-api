@@ -1,5 +1,8 @@
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
+
+from sqlalchemy import Column
+from sqlalchemy.types import DateTime
 from sqlmodel import SQLModel, Field, Relationship
 
 
@@ -31,7 +34,10 @@ class UsuarioModel(SQLModel, table=True):
     cpf: str = Field(unique=True, max_length=14)
     senha_hash: str
     ativo: bool = Field(default=True)
-    criado_em: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    criado_em: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+    )
 
     tipos: list[TipoUsuarioModel] = Relationship(
         back_populates="usuarios",

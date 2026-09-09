@@ -1,27 +1,43 @@
-import bcrypt
 from datetime import datetime, timedelta, timezone
+
+import anyio
+import bcrypt
 from jose import jwt
-from app.domain.repositories.i_usuario_repository import IUsuarioRepository
-from app.domain.exceptions.domain_exception import DomainException
+
 from app.application.dtos.auth_dto import LoginDTO, TokenResponseDTO
-from app.infrastructure.config import settings
+from app.domain.contracts.i_usuario_repository import IUsuarioRepository
+from app.domain.exceptions.autenticacao_error import AutenticacaoError
 
 
 class LoginUseCase:
-    def __init__(self, usuario_repository: IUsuarioRepository):
-        self._usuario_repository = usuario_repository
+    def __init__(
+        self,
+        usuario_repository: IUsuarioRepository,
+        jwt_secret: str,
+        jwt_algoritmo: str,
+        jwt_expiracao_minutos: int,
+    ):
+        self._usuarioRepository = usuario_repository
+        self._jwtSecret = jwt_secret
+        self._jwtAlgoritmo = jwt_algoritmo
+        self._jwtExpiracaoMinutos = jwt_expiracao_minutos
 
     async def executar(self, dto: LoginDTO) -> TokenResponseDTO:
-        usuario = await self._usuario_repository.buscar_por_email(dto.email)
+        usuario = await self._usuarioRepository.buscarPorEmail(dto.email)
 
-        # mensagem genérica para não revelar se o email existe
-        if not usuario or not bcrypt.checkpw(dto.senha.encode(), usuario.senha_hash.encode()):
-            raise DomainException("Credenciais inválidas")
+        if not usuario:
+            raise AutenticacaoError("Credenciais inválidas")
+
+        senhaOk = await anyio.to_thread.run_sync(
+            lambda: bcrypt.checkpw(dto.senha.encode(), usuario.senhaHash.encode())
+        )
+        if not senhaOk:
+            raise AutenticacaoError("Credenciais inválidas")
 
         if not usuario.ativo:
-            raise DomainException("Usuário inativo")
+            raise AutenticacaoError("Usuário inativo")
 
-        expiracao = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_expiracao_minutos)
+        expiracao = datetime.now(timezone.utc) + timedelta(minutes=self._jwtExpiracaoMinutos)
 
         payload = {
             "sub": str(usuario.id),
@@ -30,6 +46,6 @@ class LoginUseCase:
             "exp": expiracao,
         }
 
-        token = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algoritmo)
+        token = jwt.encode(payload, self._jwtSecret, algorithm=self._jwtAlgoritmo)
 
         return TokenResponseDTO(access_token=token)

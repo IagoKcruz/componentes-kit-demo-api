@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+
 from app.domain.exceptions.domain_exception import DomainException
 
 
@@ -8,11 +9,11 @@ class Email:
     valor: str
 
     def __post_init__(self):
-        if not self._is_valido(self.valor):
+        if not self._isValido(self.valor):
             raise DomainException("E-mail inválido")
 
     @staticmethod
-    def _is_valido(email: str) -> bool:
+    def _isValido(email: str) -> bool:
         padrao = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         return bool(re.match(padrao, email))
 

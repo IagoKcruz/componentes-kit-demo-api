@@ -10,37 +10,41 @@ CPF_VALIDO = "529.982.247-25"
 
 
 @pytest.fixture
-def repo():
-    return AsyncMock()
+def uow():
+    mock = AsyncMock()
+    mock.__aenter__.return_value = mock
+    mock.__aexit__.return_value = False
+    mock.usuarios = AsyncMock()
+    return mock
 
 
-async def test_criar_usuario_email_duplicado_levanta_excecao(repo):
-    repo.buscar_por_email.return_value = object()
+async def test_criar_usuario_email_duplicado_levanta_excecao(uow):
+    uow.usuarios.buscarPorEmail.return_value = object()
 
     dto = CriarUsuarioDTO(nome="Test", email="a@b.com", cpf=CPF_VALIDO, senha="Senha123", tipos=[TipoUsuario.USUARIO])
     with pytest.raises(DomainException, match="E-mail já cadastrado"):
-        await CriarUsuarioUseCase(repo).executar(dto)
+        await CriarUsuarioUseCase(uow).executar(dto)
 
 
-async def test_criar_usuario_cpf_duplicado_levanta_excecao(repo):
-    repo.buscar_por_email.return_value = None
-    repo.buscar_por_cpf.return_value = object()
+async def test_criar_usuario_cpf_duplicado_levanta_excecao(uow):
+    uow.usuarios.buscarPorEmail.return_value = None
+    uow.usuarios.buscarPorCpf.return_value = object()
 
     dto = CriarUsuarioDTO(nome="Test", email="a@b.com", cpf=CPF_VALIDO, senha="Senha123", tipos=[TipoUsuario.USUARIO])
     with pytest.raises(DomainException, match="CPF já cadastrado"):
-        await CriarUsuarioUseCase(repo).executar(dto)
+        await CriarUsuarioUseCase(uow).executar(dto)
 
 
-async def test_criar_usuario_retorna_dto(repo):
-    repo.buscar_por_email.return_value = None
-    repo.buscar_por_cpf.return_value = None
+async def test_criar_usuario_retorna_dto(uow):
+    uow.usuarios.buscarPorEmail.return_value = None
+    uow.usuarios.buscarPorCpf.return_value = None
 
     usuario = Usuario.criar("Test", "a@b.com", CPF_VALIDO, "hash", [TipoUsuario.USUARIO])
-    repo.salvar.return_value = usuario
+    uow.usuarios.salvar.return_value = usuario
 
     dto = CriarUsuarioDTO(nome="Test", email="a@b.com", cpf=CPF_VALIDO, senha="Senha123", tipos=[TipoUsuario.USUARIO])
-    resultado = await CriarUsuarioUseCase(repo).executar(dto)
+    resultado = await CriarUsuarioUseCase(uow).executar(dto)
 
     assert resultado.nome == "Test"
     assert TipoUsuario.USUARIO in resultado.tipos
-    repo.salvar.assert_awaited_once()
+    uow.usuarios.salvar.assert_awaited_once()

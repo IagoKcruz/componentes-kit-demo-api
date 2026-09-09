@@ -1,34 +1,30 @@
 from uuid import UUID
-from app.domain.repositories.i_servico_repository import IServicoRepository
-from app.domain.exceptions.domain_exception import DomainException
+from app.application.contracts.i_unit_of_work import IUnitOfWork
+from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
 from app.application.dtos.servico_dto import AtualizarServicoDTO, ServicoResponseDTO
+from app.application.mappers.servico_mapper import ServicoMapper
 
 
 class AtualizarServicoUseCase:
-    def __init__(self, servico_repository: IServicoRepository):
-        self._servico_repository = servico_repository
+    def __init__(self, uow: IUnitOfWork):
+        self._uow = uow
 
     async def executar(self, servico_id: UUID, dto: AtualizarServicoDTO) -> ServicoResponseDTO:
-        servico = await self._servico_repository.buscar_por_id(servico_id)
-        if not servico:
-            raise DomainException("Serviço não encontrado")
+        async with self._uow as uow:
+            servico = await uow.servicos.buscarPorId(servico_id)
+            if not servico:
+                raise EntidadeNaoEncontradaError("Serviço não encontrado")
 
-        servico.atualizar(
-            nome=dto.nome,
-            descricao=dto.descricao,
-            duracao_minutos=dto.duracao_minutos,
-            preco=dto.preco,
-        )
+            servico.atualizar(
+                nome=dto.nome,
+                descricao=dto.descricao,
+                duracaoMinutos=dto.duracaoMinutos,
+                preco=dto.preco,
+            )
 
-        atualizado = await self._servico_repository.atualizar(servico)
-        if not atualizado:
-            raise DomainException("Erro ao atualizar serviço")
+            atualizado = await uow.servicos.atualizar(servico)
+            if not atualizado:
+                raise EntidadeNaoEncontradaError("Serviço não encontrado")
 
-        return ServicoResponseDTO(
-            id=atualizado.id,
-            nome=atualizado.nome,
-            descricao=atualizado.descricao,
-            duracao_minutos=atualizado.duracao_minutos,
-            preco=atualizado.preco,
-            ativo=atualizado.ativo,
-        )
+            await uow.commit()
+            return ServicoMapper.paraResponseDto(atualizado)

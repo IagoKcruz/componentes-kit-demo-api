@@ -1,5 +1,7 @@
 from uuid import UUID
+
 from pydantic import BaseModel, EmailStr, Field
+
 from app.domain.enums.tipo_usuario import TipoUsuario
 
 

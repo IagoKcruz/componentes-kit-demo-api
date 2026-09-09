@@ -8,21 +8,25 @@ from app.domain.exceptions.domain_exception import DomainException
 
 
 @pytest.fixture
-def repo():
-    return AsyncMock()
+def uow():
+    mock = AsyncMock()
+    mock.__aenter__.return_value = mock
+    mock.__aexit__.return_value = False
+    mock.servicos = AsyncMock()
+    return mock
 
 
-async def test_remover_servico_nao_encontrado_levanta_excecao(repo):
-    repo.buscar_por_id.return_value = None
+async def test_remover_servico_nao_encontrado_levanta_excecao(uow):
+    uow.servicos.buscarPorId.return_value = None
 
     with pytest.raises(DomainException, match="não encontrado"):
-        await RemoverServicoUseCase(repo).executar(uuid4())
+        await RemoverServicoUseCase(uow).executar(uuid4())
 
 
-async def test_remover_servico_chama_deletar_com_id_correto(repo):
+async def test_remover_servico_chama_deletar_com_id_correto(uow):
     servico = Servico.criar("Corte", "Desc", 30, Decimal("50"))
-    repo.buscar_por_id.return_value = servico
+    uow.servicos.buscarPorId.return_value = servico
 
-    await RemoverServicoUseCase(repo).executar(servico.id)
+    await RemoverServicoUseCase(uow).executar(servico.id)
 
-    repo.deletar.assert_awaited_once_with(servico.id)
+    uow.servicos.deletar.assert_awaited_once_with(servico.id)
