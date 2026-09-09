@@ -1,7 +1,7 @@
 from uuid import UUID, uuid4
 from dataclasses import dataclass
 from decimal import Decimal
-from app.domain.exceptions.domain_exception import DomainException
+from app.domain.exceptions.domainException import DomainException
 
 
 @dataclass
@@ -9,7 +9,7 @@ class Servico:
     id: UUID
     nome: str
     descricao: str
-    duracao_minutos: int
+    duracaoMinutos: int
     preco: Decimal
     ativo: bool
 
@@ -17,12 +17,12 @@ class Servico:
     def criar(
         nome: str,
         descricao: str,
-        duracao_minutos: int,
+        duracaoMinutos: int,
         preco: Decimal,
     ) -> "Servico":
         if not nome.strip():
             raise DomainException("Nome do serviço é obrigatório")
-        if duracao_minutos <= 0:
+        if duracaoMinutos <= 0:
             raise DomainException("Duração deve ser maior que zero")
         if preco < Decimal("0"):
             raise DomainException("Preço não pode ser negativo")
@@ -31,7 +31,7 @@ class Servico:
             id=uuid4(),
             nome=nome.strip(),
             descricao=descricao,
-            duracao_minutos=duracao_minutos,
+            duracaoMinutos=duracaoMinutos,
             preco=preco,
             ativo=True,
         )
@@ -40,7 +40,7 @@ class Servico:
         self,
         nome: str | None = None,
         descricao: str | None = None,
-        duracao_minutos: int | None = None,
+        duracaoMinutos: int | None = None,
         preco: Decimal | None = None,
     ) -> None:
         if nome is not None:
@@ -49,10 +49,10 @@ class Servico:
             self.nome = nome.strip()
         if descricao is not None:
             self.descricao = descricao
-        if duracao_minutos is not None:
-            if duracao_minutos <= 0:
+        if duracaoMinutos is not None:
+            if duracaoMinutos <= 0:
                 raise DomainException("Duração deve ser maior que zero")
-            self.duracao_minutos = duracao_minutos
+            self.duracaoMinutos = duracaoMinutos
         if preco is not None:
             if preco < Decimal("0"):
                 raise DomainException("Preço não pode ser negativo")

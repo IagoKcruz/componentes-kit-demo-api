@@ -1,31 +1,19 @@
-from collections.abc import Iterator
-from sqlmodel import SQLModel, Session, create_engine, select
+from collections.abc import AsyncIterator
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlmodel import SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
 from app.infrastructure.config import settings
 
-engine = create_engine(
-    settings.database_url,
-    echo=settings.debug,
-)
+_connect_args = {"ssl": "require"} if "supabase.com" in settings.database_url else {}
+engine = create_async_engine(settings.database_url, echo=settings.debug, connect_args=_connect_args)
+_sessionFactory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
-def criar_tabelas() -> None:
-    SQLModel.metadata.create_all(engine)
+async def criarTabelas() -> None:
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)
 
 
-def seed_tipos_usuario() -> None:
-    from app.infrastructure.database.models.usuario_model import TipoUsuarioModel
-
-    tipos = ["admin", "usuario", "funcionario"]
-    with Session(engine) as session:
-        for nome in tipos:
-            existe = session.exec(
-                select(TipoUsuarioModel).where(TipoUsuarioModel.nome == nome)
-            ).first()
-            if not existe:
-                session.add(TipoUsuarioModel(nome=nome))
-        session.commit()
-
-
-def get_session() -> Iterator[Session]:
-    with Session(engine) as session:
+async def getSession() -> AsyncIterator[AsyncSession]:
+    async with _sessionFactory() as session:
         yield session
