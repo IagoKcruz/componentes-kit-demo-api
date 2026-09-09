@@ -1,15 +1,17 @@
 from uuid import UUID
-from app.domain.repositories.i_servico_repository import IServicoRepository
-from app.domain.exceptions.domain_exception import DomainException
+from app.application.contracts.iUnitOfWork import IUnitOfWork
+from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
 
 
 class RemoverServicoUseCase:
-    def __init__(self, servico_repository: IServicoRepository):
-        self._servico_repository = servico_repository
+    def __init__(self, uow: IUnitOfWork):
+        self._uow = uow
 
     async def executar(self, servico_id: UUID) -> None:
-        servico = await self._servico_repository.buscar_por_id(servico_id)
-        if not servico:
-            raise DomainException("Serviço não encontrado")
+        async with self._uow as uow:
+            servico = await uow.servicos.buscar_por_id(servico_id)
+            if not servico:
+                raise EntidadeNaoEncontradaError("Serviço não encontrado")
 
-        await self._servico_repository.deletar(servico_id)
+            await uow.servicos.deletar(servico_id)
+            await uow.commit()

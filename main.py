@@ -1,14 +1,18 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.infrastructure.database.session import criar_tabelas, seed_tipos_usuario
 from app.presentation.routers import usuario_router, servico_router, auth_router
+from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
+from app.domain.exceptions.validacao_error import ValidacaoError
+from app.domain.exceptions.autenticacao_error import AutenticacaoError
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    criar_tabelas()
-    seed_tipos_usuario()
+    await criar_tabelas()
+    await seed_tipos_usuario()
     yield
 
 
@@ -26,6 +30,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(EntidadeNaoEncontradaError)
+async def handle_nao_encontrado(_, exc: EntidadeNaoEncontradaError):
+    return JSONResponse(status_code=404, content={"detail": exc.mensagem})
+
+
+@app.exception_handler(ValidacaoError)
+async def handle_validacao(_, exc: ValidacaoError):
+    return JSONResponse(status_code=400, content={"detail": exc.mensagem})
+
+
+@app.exception_handler(AutenticacaoError)
+async def handle_autenticacao(_, exc: AutenticacaoError):
+    return JSONResponse(status_code=401, content={"detail": exc.mensagem})
+
 
 app.include_router(auth_router.router)
 app.include_router(usuario_router.router)

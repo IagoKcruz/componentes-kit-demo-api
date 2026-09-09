@@ -1,36 +1,27 @@
 from uuid import UUID
-from app.domain.entities.usuario import Usuario
-from app.domain.repositories.i_usuario_repository import IUsuarioRepository
-from app.domain.exceptions.domain_exception import DomainException
+from app.application.contracts.iUnitOfWork import IUnitOfWork
+from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
 from app.application.dtos.usuario_dto import UsuarioResponseDTO
-
-
-def _para_dto(usuario: Usuario) -> UsuarioResponseDTO:
-    return UsuarioResponseDTO(
-        id=usuario.id,
-        nome=usuario.nome,
-        email=str(usuario.email),
-        cpf=str(usuario.cpf),
-        ativo=usuario.ativo,
-        tipos=usuario.tipos,
-    )
+from app.application.mappers.usuario_mapper import UsuarioMapper
 
 
 class BuscarUsuarioPorIdUseCase:
-    def __init__(self, usuario_repository: IUsuarioRepository):
-        self._usuario_repository = usuario_repository
+    def __init__(self, uow: IUnitOfWork):
+        self._uow = uow
 
     async def executar(self, usuario_id: UUID) -> UsuarioResponseDTO:
-        usuario = await self._usuario_repository.buscar_por_id(usuario_id)
-        if not usuario:
-            raise DomainException("Usuário não encontrado")
-        return _para_dto(usuario)
+        async with self._uow as uow:
+            usuario = await uow.usuarios.buscar_por_id(usuario_id)
+            if not usuario:
+                raise EntidadeNaoEncontradaError("Usuário não encontrado")
+            return UsuarioMapper.para_response_dto(usuario)
 
 
 class ListarUsuariosUseCase:
-    def __init__(self, usuario_repository: IUsuarioRepository):
-        self._usuario_repository = usuario_repository
+    def __init__(self, uow: IUnitOfWork):
+        self._uow = uow
 
     async def executar(self) -> list[UsuarioResponseDTO]:
-        usuarios = await self._usuario_repository.listar()
-        return [_para_dto(u) for u in usuarios]
+        async with self._uow as uow:
+            usuarios = await uow.usuarios.listar()
+            return [UsuarioMapper.para_response_dto(u) for u in usuarios]

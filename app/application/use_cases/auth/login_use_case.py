@@ -2,7 +2,7 @@ import bcrypt
 from datetime import datetime, timedelta, timezone
 from jose import jwt
 from app.domain.repositories.i_usuario_repository import IUsuarioRepository
-from app.domain.exceptions.domain_exception import DomainException
+from app.domain.exceptions.autenticacao_error import AutenticacaoError
 from app.application.dtos.auth_dto import LoginDTO, TokenResponseDTO
 from app.infrastructure.config import settings
 
@@ -16,10 +16,10 @@ class LoginUseCase:
 
         # mensagem genérica para não revelar se o email existe
         if not usuario or not bcrypt.checkpw(dto.senha.encode(), usuario.senha_hash.encode()):
-            raise DomainException("Credenciais inválidas")
+            raise AutenticacaoError("Credenciais inválidas")
 
         if not usuario.ativo:
-            raise DomainException("Usuário inativo")
+            raise AutenticacaoError("Usuário inativo")
 
         expiracao = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_expiracao_minutos)
 
