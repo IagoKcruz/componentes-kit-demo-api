@@ -1,6 +1,6 @@
 import pytest
-from app.domain.value_objects.email import Email
-from app.domain.exceptions.domain_exception import DomainException
+from app.domain.valueObjects.email import Email
+from app.domain.exceptions.domainException import DomainException
 
 
 def test_email_valido():

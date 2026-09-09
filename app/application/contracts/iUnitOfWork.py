@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from app.domain.repositories.i_servico_repository import IServicoRepository
-from app.domain.repositories.i_usuario_repository import IUsuarioRepository
+from app.domain.contracts.iServicoRepository import IServicoRepository
+from app.domain.contracts.iUsuarioRepository import IUsuarioRepository
 
 
 class IUnitOfWork(ABC):

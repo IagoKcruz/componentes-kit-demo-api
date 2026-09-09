@@ -1,11 +1,11 @@
 from sqlmodel import select
-from app.infrastructure.database.session import _session_factory
-from app.infrastructure.database.models.usuario_model import TipoUsuarioModel
+from app.infrastructure.database.session import _sessionFactory
+from app.infrastructure.database.models.usuarioModel import TipoUsuarioModel
 
 
-async def seed_tipos_usuario() -> None:
+async def seedTiposUsuario() -> None:
     tipos = ["admin", "usuario", "funcionario"]
-    async with _session_factory() as session:
+    async with _sessionFactory() as session:
         for nome in tipos:
             result = await session.exec(
                 select(TipoUsuarioModel).where(TipoUsuarioModel.nome == nome)
