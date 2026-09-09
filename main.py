@@ -2,7 +2,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.infrastructure.database.session import criar_tabelas, seed_tipos_usuario
+from app.infrastructure.database.session import criar_tabelas
+from app.infrastructure.database.seed import seed_tipos_usuario
 from app.presentation.routers import usuario_router, servico_router, auth_router
 from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
 from app.domain.exceptions.validacao_error import ValidacaoError
