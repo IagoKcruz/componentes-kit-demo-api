@@ -45,7 +45,7 @@ async def test_login_usuario_inativo_levanta_excecao(repo):
     usuario.desativar()
     repo.buscarPorEmail.return_value = usuario
 
-    with pytest.raises(DomainException, match="Usuário inativo"):
+    with pytest.raises(DomainException, match="Credenciais inválidas"):
         await _use_case(repo).executar(LoginDTO(email="a@b.com", senha=SENHA))
 
 

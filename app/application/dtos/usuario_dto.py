@@ -10,7 +10,7 @@ class CriarUsuarioDTO(BaseModel):
     email: EmailStr
     cpf: str
     senha: str = Field(min_length=6)
-    tipos: list[TipoUsuario]
+    tipos: list[TipoUsuario] = Field(min_length=1)
 
 
 class UsuarioResponseDTO(BaseModel):
