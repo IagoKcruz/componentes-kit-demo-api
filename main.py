@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -34,6 +35,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def handleValidacaoPydantic(_: Request, exc: RequestValidationError):
+    mensagens = [e["msg"].removeprefix("Value error, ") for e in exc.errors()]
+    return JSONResponse(status_code=422, content={"detail": "; ".join(mensagens)})
 
 
 @app.exception_handler(EntidadeNaoEncontradaError)
