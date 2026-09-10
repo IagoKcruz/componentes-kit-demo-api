@@ -1,0 +1,14 @@
+services:
+  api:
+    build: .
+    container_name: agendamentos-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DEBUG: ${DEBUG:-true}
+      AUTH_HABILITADO: ${AUTH_HABILITADO:-true}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITMO: ${JWT_ALGORITMO:-HS256}
+      JWT_EXPIRACAO_MINUTOS: ${JWT_EXPIRACAO_MINUTOS:-60}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
