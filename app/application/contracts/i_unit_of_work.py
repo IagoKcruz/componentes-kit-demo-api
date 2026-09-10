@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from typing_extensions import Self
+
 from app.domain.contracts.i_servico_repository import IServicoRepository
 from app.domain.contracts.i_usuario_repository import IUsuarioRepository
 
@@ -8,7 +10,7 @@ class IUnitOfWork(ABC):
     servicos: IServicoRepository
     usuarios: IUsuarioRepository
 
-    async def __aenter__(self) -> "IUnitOfWork":
+    async def __aenter__(self) -> Self:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
