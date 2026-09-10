@@ -1,0 +1,3 @@
+[lint]
+# B008: Depends() em default de argumento é o padrão correto do FastAPI
+ignore = ["B008"]

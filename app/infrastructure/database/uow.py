@@ -1,3 +1,5 @@
+from typing_extensions import Self
+
 from app.application.contracts.i_unit_of_work import IUnitOfWork
 from app.infrastructure.database.session import _sessionFactory
 from app.infrastructure.repositories.servico_repository import ServicoRepository
@@ -5,7 +7,7 @@ from app.infrastructure.repositories.usuario_repository import UsuarioRepository
 
 
 class SqlModelUnitOfWork(IUnitOfWork):
-    async def __aenter__(self) -> "SqlModelUnitOfWork":
+    async def __aenter__(self) -> Self:
         self._session = _sessionFactory()
         self.servicos = ServicoRepository(self._session)
         self.usuarios = UsuarioRepository(self._session)

@@ -1,5 +1,5 @@
-from app.domain.entities.usuario import Usuario
 from app.application.dtos.usuario_dto import UsuarioResponseDTO
+from app.domain.entities.usuario import Usuario
 
 
 class UsuarioMapper:

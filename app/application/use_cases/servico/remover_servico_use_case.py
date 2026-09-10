@@ -1,6 +1,9 @@
 from uuid import UUID
+
 from app.application.contracts.i_unit_of_work import IUnitOfWork
-from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
+from app.domain.exceptions.entidade_nao_encontrada_error import (
+    EntidadeNaoEncontradaError,
+)
 
 
 class RemoverServicoUseCase:

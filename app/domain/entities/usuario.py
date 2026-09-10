@@ -1,10 +1,10 @@
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
+from uuid import UUID, uuid4
 
-from app.domain.value_objects.email import Email
-from app.domain.value_objects.cpf import CPF
 from app.domain.enums.tipo_usuario import TipoUsuario
 from app.domain.exceptions.domain_exception import DomainException
+from app.domain.value_objects.cpf import CPF
+from app.domain.value_objects.email import Email
 
 
 @dataclass

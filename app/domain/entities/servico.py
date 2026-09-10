@@ -1,6 +1,6 @@
-from uuid import UUID, uuid4
 from dataclasses import dataclass
 from decimal import Decimal
+from uuid import UUID, uuid4
 
 from app.domain.exceptions.domain_exception import DomainException
 

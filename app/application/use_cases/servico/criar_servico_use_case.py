@@ -1,7 +1,7 @@
-from app.domain.entities.servico import Servico
 from app.application.contracts.i_unit_of_work import IUnitOfWork
 from app.application.dtos.servico_dto import CriarServicoDTO, ServicoResponseDTO
 from app.application.mappers.servico_mapper import ServicoMapper
+from app.domain.entities.servico import Servico
 
 
 class CriarServicoUseCase:

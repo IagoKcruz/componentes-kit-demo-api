@@ -1,8 +1,11 @@
 from uuid import UUID
+
 from app.application.contracts.i_unit_of_work import IUnitOfWork
-from app.domain.exceptions.entidade_nao_encontrada_error import EntidadeNaoEncontradaError
 from app.application.dtos.servico_dto import AtualizarServicoDTO, ServicoResponseDTO
 from app.application.mappers.servico_mapper import ServicoMapper
+from app.domain.exceptions.entidade_nao_encontrada_error import (
+    EntidadeNaoEncontradaError,
+)
 
 
 class AtualizarServicoUseCase:

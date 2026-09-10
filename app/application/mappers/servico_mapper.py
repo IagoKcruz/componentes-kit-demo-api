@@ -1,5 +1,5 @@
-from app.domain.entities.servico import Servico
 from app.application.dtos.servico_dto import ServicoResponseDTO
+from app.domain.entities.servico import Servico
 
 
 class ServicoMapper:

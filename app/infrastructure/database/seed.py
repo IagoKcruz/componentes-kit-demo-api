@@ -1,8 +1,8 @@
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 
 from app.domain.enums.tipo_usuario import TipoUsuario
-from app.infrastructure.database.session import _sessionFactory
 from app.infrastructure.database.models.usuario_model import TipoUsuarioModel
+from app.infrastructure.database.session import _sessionFactory
 
 
 async def seedTiposUsuario() -> None:
