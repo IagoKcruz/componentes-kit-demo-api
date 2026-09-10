@@ -44,7 +44,7 @@ app.add_middleware(
 @app.exception_handler(RequestValidationError)
 async def handleValidacaoPydantic(_: Request, exc: RequestValidationError):
     mensagens = [e["msg"].removeprefix("Value error, ") for e in exc.errors()]
-    return JSONResponse(status_code=422, content={"detail": "; ".join(mensagens)})
+    return JSONResponse(status_code=422, content={"detail": mensagens})
 
 
 @app.exception_handler(DomainException)

@@ -1,6 +1,8 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 from app.application.contracts.i_unit_of_work import IUnitOfWork
 from app.application.dtos.servico_dto import AtualizarServicoDTO, CriarServicoDTO, ServicoResponseDTO
@@ -20,9 +22,16 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=ServicoResponseDTO, status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def criarServico(dto: CriarServicoDTO, uow: IUnitOfWork = Depends(getUow)):
-    return await CriarServicoUseCase(uow).executar(dto)
+    servico = await CriarServicoUseCase(uow).executar(dto)
+    resposta = jsonable_encoder(servico)
+    if dto.preco == 0:
+        resposta["notificacao"] = {
+            "tipo": "informacao",
+            "mensagem": "Serviço cadastrado como gratuito (R$ 0,00). Confirme se isso é intencional.",
+        }
+    return JSONResponse(content=resposta, status_code=status.HTTP_201_CREATED)
 
 
 @router.get("/", response_model=list[ServicoResponseDTO])
